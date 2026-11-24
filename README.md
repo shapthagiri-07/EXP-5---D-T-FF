@@ -13,6 +13,7 @@ Both flip-flops used here are also provided with an active-high asynchronous res
 Q(next) = D
 ### T Flip-Flop
 Q(next) = T ⊕ Q   (Q(next) = Q if T = 0, Q(next) = Q' if T = 1)
+
 ## Files to be Created
 <img width="625" height="50" alt="image" src="https://github.com/user-attachments/assets/65034a51-5642-46ac-940a-f7ee975cea9c" />
 
@@ -163,6 +164,7 @@ The design was compiled and simulated using Synopsys VCS, and the functionality 
 
 ##Output
 <img width="690" height="384" alt="image" src="https://github.com/user-attachments/assets/1a84f711-85cd-4dc4-b911-650d3435dbc2" />
+
 <img width="672" height="376" alt="image" src="https://github.com/user-attachments/assets/27f7bbec-516a-47ef-8b17-47bf318a01b6" />
 
 ## Result
