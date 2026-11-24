@@ -2,10 +2,12 @@
 # Design and Verification of D Flip-Flop and T Flip-Flop
 ## Aim
 To design and verify a D Flip-Flop and a T Flip-Flop using Verilog HDL, and to observe their behaviour using a testbench and VCD waveform.
+
 ## Theory / Synopsis
 A D Flip-Flop (Data / Delay Flip-Flop) is an edge-triggered sequential element that transfers the value present at its input D to the output Q on the active (rising) edge of the clock. It is commonly used to store one bit of data and eliminates the race-around problem seen in level-triggered latches.
 A T Flip-Flop (Toggle Flip-Flop) is an edge-triggered sequential element whose output toggles (complements) on every active clock edge when the toggle input T is high, and holds its previous state when T is low. It is widely used in counter and frequency-divider circuits.
 Both flip-flops used here are also provided with an active-high asynchronous reset that forces Q to 0 irrespective of the clock.
+
 ## Boolean / Characteristic Equations
 ### D Flip-Flop
 Q(next) = D
@@ -15,10 +17,92 @@ Q(next) = T ⊕ Q   (Q(next) = Q if T = 0, Q(next) = Q' if T = 1)
 <img width="625" height="50" alt="image" src="https://github.com/user-attachments/assets/65034a51-5642-46ac-940a-f7ee975cea9c" />
 
 ## Design / RTL Program
+// gedit dff_tff.v
+ 
+module dff (
+    input  wire clk,   // clock
+    input  wire rst,   // asynchronous active-high reset
+    input  wire D,     // data input
+    output reg  Q      // output
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            Q <= 1'b0;
+        else
+            Q <= D;
+    end
+endmodule
+ 
+module tff (
+    input  wire clk,   // clock
+    input  wire rst,   // asynchronous active-high reset
+    input  wire T,     // toggle input
+    output reg  Q      // output
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            Q <= 1'b0;
+        else if (T)
+            Q <= ~Q;
+        else
+            Q <= Q;
+    end
+endmodule
 
 ## Testbench Program
-
-
+// gedit tb5.v
+ 
+module tb5;
+    reg  clk, rst, D, T;
+    wire Qd, Qt;
+ 
+   // Instantiate the D Flip-Flop
+    dff dff_uut (
+        .clk(clk),
+        .rst(rst),
+        .D(D),
+        .Q(Qd)
+    );
+ 
+   // Instantiate the T Flip-Flop
+    tff tff_uut (
+        .clk(clk),
+        .rst(rst),
+        .T(T),
+        .Q(Qt)
+    );
+ 
+  // ---- Clock generation: 10 time-unit period ----
+    initial clk = 0;
+    always #5 clk = ~clk;
+ 
+  initial begin
+// ---- VCD dump setup ----
+        $dumpfile("dff_tff.vcd");   // name of the VCD file to be generated
+        $dumpvars(0, tb5);            // dump all signals in this testbench hierarchy
+ 
+   $monitor("Time=%0t rst=%b clk=%b | D=%b Qd=%b | T=%b Qt=%b",
+                  $time, rst, clk, D, Qd, T, Qt);
+ 
+   // ---- Apply asynchronous reset ----
+        rst = 1; D = 0; T = 0;
+        #7  rst = 0;
+ 
+   // ---- Apply test vectors on successive clock edges ----
+        @(negedge clk); D = 1; T = 1;
+        @(negedge clk); D = 0; T = 1;
+        @(negedge clk); D = 1; T = 0;
+        @(negedge clk); D = 0; T = 0;
+        @(negedge clk); D = 1; T = 1;
+        @(negedge clk); D = 1; T = 1;
+ 
+   // ---- Apply reset again mid-simulation ----
+        @(negedge clk); rst = 1;
+        @(negedge clk); rst = 0; D = 1; T = 1;
+ 
+   #20 $finish;
+    end
+endmodule
 
 ## Truth Table
 
@@ -78,8 +162,9 @@ Q(next) = T ⊕ Q   (T Flip-Flop)
 The design was compiled and simulated using Synopsys VCS, and the functionality was verified using DVE waveform analysis, matching the expected truth table.
 
 **## Output**
+<img width="690" height="384" alt="image" src="https://github.com/user-attachments/assets/1a84f711-85cd-4dc4-b911-650d3435dbc2" />
 
-
+<img width="672" height="376" alt="image" src="https://github.com/user-attachments/assets/27f7bbec-516a-47ef-8b17-47bf318a01b6" />
 
 ## Result
 
